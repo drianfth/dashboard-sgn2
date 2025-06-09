@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { ToolButton } from './ToolButton';
 import { ToolGroup } from './ToolGroup';
-import { ColorPicker } from '../UI/ColorPicker';
+// import { ColorPicker } from '../UI/ColorPicker';
 import { DrawingTool, StrokeProperties } from '@/types';
 import {
   MousePointer2,
@@ -21,6 +21,7 @@ import {
   Redo,
   Grid3X3
 } from 'lucide-react';
+import { ColorPicker } from '../ui/ColorPicker';
 
 interface MainToolbarProps {
   selectedTool: DrawingTool;
