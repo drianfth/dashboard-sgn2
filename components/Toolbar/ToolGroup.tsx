@@ -12,7 +12,7 @@ export function ToolGroup({ children, showSeparator = true }: ToolGroupProps) {
   return (
     <div className="flex items-center space-x-1">
       {children}
-      {showSeparator && <Separator orientation="vertical\" className="h-6 mx-2" />}
+      {showSeparator && <Separator orientation="vertical" className="h-6 mx-2" />}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Plus } from 'lucide-react';
 import { ChartData } from '@/types';
-import { ColorPicker } from '../UI/ColorPicker';
+import { ColorPicker } from '../ui/ColorPicker';
 
 interface ChartEditorProps {
   chartData: ChartData;
@@ -48,14 +48,14 @@ export function ChartEditor({ chartData, onDataChange }: ChartEditorProps) {
   const updateLabelValue = (labelIndex: number, datasetIndex: number, value: number) => {
     const updatedData = {
       ...chartData,
-      datasets: chartData.datasets.map((dataset, dsIndex) => 
-        dsIndex === datasetIndex 
+      datasets: chartData.datasets.map((dataset, dsIndex) =>
+        dsIndex === datasetIndex
           ? {
-              ...dataset,
-              data: dataset.data.map((val, valIndex) => 
-                valIndex === labelIndex ? value : val
-              )
-            }
+            ...dataset,
+            data: dataset.data.map((val, valIndex) =>
+              valIndex === labelIndex ? value : val
+            )
+          }
           : dataset
       )
     };
@@ -66,7 +66,7 @@ export function ChartEditor({ chartData, onDataChange }: ChartEditorProps) {
     const newDataset = {
       name: `Series ${chartData.datasets.length + 1}`,
       data: new Array(chartData.labels.length).fill(0),
-      color: `#${Math.floor(Math.random()*16777215).toString(16)}`
+      color: `#${Math.floor(Math.random() * 16777215).toString(16)}`
     };
     onDataChange({
       ...chartData,
@@ -84,7 +84,7 @@ export function ChartEditor({ chartData, onDataChange }: ChartEditorProps) {
   const updateDatasetName = (index: number, name: string) => {
     const updatedData = {
       ...chartData,
-      datasets: chartData.datasets.map((dataset, i) => 
+      datasets: chartData.datasets.map((dataset, i) =>
         i === index ? { ...dataset, name } : dataset
       )
     };
@@ -94,7 +94,7 @@ export function ChartEditor({ chartData, onDataChange }: ChartEditorProps) {
   const updateDatasetColor = (index: number, color: string) => {
     const updatedData = {
       ...chartData,
-      datasets: chartData.datasets.map((dataset, i) => 
+      datasets: chartData.datasets.map((dataset, i) =>
         i === index ? { ...dataset, color } : dataset
       )
     };
@@ -188,8 +188,8 @@ export function ChartEditor({ chartData, onDataChange }: ChartEditorProps) {
                       type="number"
                       value={dataset.data[labelIndex] || 0}
                       onChange={(e) => updateLabelValue(
-                        labelIndex, 
-                        datasetIndex, 
+                        labelIndex,
+                        datasetIndex,
                         parseFloat(e.target.value) || 0
                       )}
                       className="flex-1"
