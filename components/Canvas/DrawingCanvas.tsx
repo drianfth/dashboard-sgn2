@@ -37,7 +37,7 @@ export function DrawingCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
   const chartCanvasCache = useRef<Map<string, HTMLCanvasElement>>(new Map());
-  
+
   const [interaction, setInteraction] = useState<CanvasInteraction>({
     isDrawing: false,
     startPoint: null,
@@ -81,7 +81,7 @@ export function DrawingCanvas({
   const getCanvasCoordinates = useCallback((clientX: number, clientY: number): Position => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
-    
+
     const rect = canvas.getBoundingClientRect();
     return {
       x: (clientX - rect.left) / zoom,
@@ -94,14 +94,14 @@ export function DrawingCanvas({
     const ctx = getContext();
     const canvas = canvasRef.current;
     if (!ctx || !canvas) return;
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }, [getContext]);
 
   // Draw grid
   const drawGrid = useCallback(() => {
     if (!showGrid) return;
-    
+
     const ctx = getContext();
     const canvas = canvasRef.current;
     if (!ctx || !canvas) return;
@@ -112,7 +112,7 @@ export function DrawingCanvas({
     ctx.globalAlpha = 0.5;
 
     const gridSize = 20 * zoom;
-    
+
     // Vertical lines
     for (let x = 0; x <= canvas.width; x += gridSize) {
       ctx.beginPath();
@@ -120,7 +120,7 @@ export function DrawingCanvas({
       ctx.lineTo(x, canvas.height);
       ctx.stroke();
     }
-    
+
     // Horizontal lines
     for (let y = 0; y <= canvas.height; y += gridSize) {
       ctx.beginPath();
@@ -128,7 +128,7 @@ export function DrawingCanvas({
       ctx.lineTo(canvas.width, y);
       ctx.stroke();
     }
-    
+
     ctx.restore();
   }, [showGrid, zoom, getContext]);
 
@@ -138,7 +138,7 @@ export function DrawingCanvas({
     ctx.lineWidth = properties.width * zoom;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    
+
     if (properties.style === 'dashed') {
       ctx.setLineDash([5 * zoom, 5 * zoom]);
     } else if (properties.style === 'dotted') {
@@ -151,7 +151,7 @@ export function DrawingCanvas({
   // Check if point is inside element bounds
   const isPointInElement = useCallback((point: Position, element: DrawingElement): boolean => {
     const tolerance = 10 / zoom; // Adjust tolerance based on zoom
-    
+
     switch (element.type) {
       case 'pen':
         if (element.points && element.points.length > 0) {
@@ -183,10 +183,10 @@ export function DrawingCanvas({
             width: element.dimensions.width,
             height: element.dimensions.height
           };
-          return point.x >= bounds.x - tolerance && 
-                 point.x <= bounds.x + bounds.width + tolerance &&
-                 point.y >= bounds.y - tolerance && 
-                 point.y <= bounds.y + bounds.height + tolerance;
+          return point.x >= bounds.x - tolerance &&
+            point.x <= bounds.x + bounds.width + tolerance &&
+            point.y >= bounds.y - tolerance &&
+            point.y <= bounds.y + bounds.height + tolerance;
         }
         return false;
 
@@ -200,10 +200,10 @@ export function DrawingCanvas({
             width: textWidth,
             height: fontSize
           };
-          return point.x >= bounds.x - tolerance && 
-                 point.x <= bounds.x + bounds.width + tolerance &&
-                 point.y >= bounds.y - tolerance && 
-                 point.y <= bounds.y + bounds.height + tolerance;
+          return point.x >= bounds.x - tolerance &&
+            point.x <= bounds.x + bounds.width + tolerance &&
+            point.y >= bounds.y - tolerance &&
+            point.y <= bounds.y + bounds.height + tolerance;
         }
         return false;
 
@@ -221,7 +221,7 @@ export function DrawingCanvas({
 
     const dot = A * C + B * D;
     const lenSq = C * C + D * D;
-    
+
     if (lenSq === 0) {
       // Line start and end are the same point
       return Math.sqrt(A * A + B * B);
@@ -235,7 +235,7 @@ export function DrawingCanvas({
 
     const dx = point.x - xx;
     const dy = point.y - yy;
-    
+
     return Math.sqrt(dx * dx + dy * dy);
   }, []);
 
@@ -304,7 +304,7 @@ export function DrawingCanvas({
   // Move element by offset
   const moveElement = useCallback((element: DrawingElement, offset: Position): DrawingElement => {
     const newElement = { ...element };
-    
+
     switch (element.type) {
       case 'pen':
         if (element.points) {
@@ -363,7 +363,7 @@ export function DrawingCanvas({
 
     // Clear and setup canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Draw background
     ctx.fillStyle = styling.backgroundColor || '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -396,15 +396,15 @@ export function DrawingCanvas({
         case 'bar':
           const barWidth = chartArea.width / dataset.data.length;
           const maxValue = Math.max(...dataset.data, 1);
-          
+
           dataset.data.forEach((value: number, index: number) => {
             const barHeight = (value / maxValue) * chartArea.height;
             const x = chartArea.x + index * barWidth + barWidth * 0.1;
             const y = chartArea.y + chartArea.height - barHeight;
-            
+
             ctx.fillStyle = dataset.color || colorPalette[index % colorPalette.length];
             ctx.fillRect(x, y, barWidth * 0.8, barHeight);
-            
+
             // Value labels
             ctx.fillStyle = styling.textColor || '#374151';
             ctx.font = '12px Arial';
@@ -426,18 +426,18 @@ export function DrawingCanvas({
         case 'line':
           const pointSpacing = chartArea.width / Math.max(dataset.data.length - 1, 1);
           const maxLineValue = Math.max(...dataset.data, 1);
-          
+
           ctx.strokeStyle = dataset.color || '#3B82F6';
           ctx.lineWidth = 3;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
           ctx.beginPath();
-          
+
           let firstPoint = true;
           dataset.data.forEach((value: number, index: number) => {
             const x = chartArea.x + (dataset.data.length === 1 ? chartArea.width / 2 : index * pointSpacing);
             const y = chartArea.y + chartArea.height - (value / maxLineValue) * chartArea.height;
-            
+
             if (firstPoint) {
               ctx.moveTo(x, y);
               firstPoint = false;
@@ -446,13 +446,13 @@ export function DrawingCanvas({
             }
           });
           ctx.stroke();
-          
+
           // Draw data points
           ctx.fillStyle = dataset.color || '#3B82F6';
           dataset.data.forEach((value: number, index: number) => {
             const x = chartArea.x + (dataset.data.length === 1 ? chartArea.width / 2 : index * pointSpacing);
             const y = chartArea.y + chartArea.height - (value / maxLineValue) * chartArea.height;
-            
+
             ctx.beginPath();
             ctx.arc(x, y, 4, 0, 2 * Math.PI);
             ctx.fill();
@@ -473,35 +473,35 @@ export function DrawingCanvas({
         case 'area':
           const areaPointSpacing = chartArea.width / Math.max(dataset.data.length - 1, 1);
           const maxAreaValue = Math.max(...dataset.data, 1);
-          
+
           // Create area path
           ctx.beginPath();
           ctx.moveTo(chartArea.x, chartArea.y + chartArea.height);
-          
+
           dataset.data.forEach((value: number, index: number) => {
             const x = chartArea.x + (dataset.data.length === 1 ? chartArea.width / 2 : index * areaPointSpacing);
             const y = chartArea.y + chartArea.height - (value / maxAreaValue) * chartArea.height;
             ctx.lineTo(x, y);
           });
-          
+
           ctx.lineTo(chartArea.x + chartArea.width, chartArea.y + chartArea.height);
           ctx.closePath();
-          
+
           // Fill area
           const color = dataset.color || '#3B82F6';
           ctx.fillStyle = color + '40';
           ctx.fill();
-          
+
           // Draw line
           ctx.strokeStyle = color;
           ctx.lineWidth = 2;
           ctx.beginPath();
-          
+
           let firstAreaPoint = true;
           dataset.data.forEach((value: number, index: number) => {
             const x = chartArea.x + (dataset.data.length === 1 ? chartArea.width / 2 : index * areaPointSpacing);
             const y = chartArea.y + chartArea.height - (value / maxAreaValue) * chartArea.height;
-            
+
             if (firstAreaPoint) {
               ctx.moveTo(x, y);
               firstAreaPoint = false;
@@ -510,7 +510,7 @@ export function DrawingCanvas({
             }
           });
           ctx.stroke();
-          
+
           // Draw points
           ctx.fillStyle = color;
           dataset.data.forEach((value: number, index: number) => {
@@ -526,52 +526,52 @@ export function DrawingCanvas({
           const centerX = chartArea.x + chartArea.width / 2;
           const centerY = chartArea.y + chartArea.height / 2;
           const radius = Math.min(chartArea.width, chartArea.height) / 2 - 40;
-          
+
           const total = dataset.data.reduce((sum: number, value: number) => sum + value, 0);
           let currentAngle = -Math.PI / 2;
-          
+
           dataset.data.forEach((value: number, index: number) => {
             const sliceAngle = (value / total) * 2 * Math.PI;
             const sliceColor = colorPalette[index % colorPalette.length];
-            
+
             ctx.fillStyle = sliceColor;
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
             ctx.closePath();
             ctx.fill();
-            
+
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 2;
             ctx.stroke();
-            
+
             // Percentage labels
             const labelAngle = currentAngle + sliceAngle / 2;
             const labelRadius = radius * 0.7;
             const labelX = centerX + Math.cos(labelAngle) * labelRadius;
             const labelY = centerY + Math.sin(labelAngle) * labelRadius;
-            
+
             const percentage = ((value / total) * 100).toFixed(1);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 10px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(`${percentage}%`, labelX, labelY);
-            
+
             currentAngle += sliceAngle;
           });
 
           // Legend
           const legendX = chartArea.x + chartArea.width + 20;
           const legendY = chartArea.y + 20;
-          
+
           chartData.labels.forEach((label: string, index: number) => {
             const y = legendY + index * 20;
             const legendColor = colorPalette[index % colorPalette.length];
-            
+
             ctx.fillStyle = legendColor;
             ctx.fillRect(legendX, y - 6, 12, 12);
-            
+
             ctx.fillStyle = styling.textColor || '#374151';
             ctx.font = '11px Arial';
             ctx.textAlign = 'left';
@@ -586,7 +586,7 @@ export function DrawingCanvas({
           const radarRadius = Math.min(chartArea.width, chartArea.height) / 2 - 40;
           const angleStep = (2 * Math.PI) / chartData.labels.length;
           const maxRadarValue = Math.max(...dataset.data, 1);
-          
+
           // Grid circles
           ctx.strokeStyle = '#e5e7eb';
           ctx.lineWidth = 1;
@@ -596,54 +596,54 @@ export function DrawingCanvas({
             ctx.arc(radarCenterX, radarCenterY, gridRadius, 0, 2 * Math.PI);
             ctx.stroke();
           }
-          
+
           // Axes and labels
           chartData.labels.forEach((label: string, index: number) => {
             const angle = index * angleStep - Math.PI / 2;
             const x = radarCenterX + Math.cos(angle) * radarRadius;
             const y = radarCenterY + Math.sin(angle) * radarRadius;
-            
+
             ctx.strokeStyle = '#e5e7eb';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(radarCenterX, radarCenterY);
             ctx.lineTo(x, y);
             ctx.stroke();
-            
+
             const labelX = radarCenterX + Math.cos(angle) * (radarRadius + 15);
             const labelY = radarCenterY + Math.sin(angle) * (radarRadius + 15);
-            
+
             ctx.fillStyle = styling.textColor || '#374151';
             ctx.font = '10px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(label, labelX, labelY);
           });
-          
+
           // Data polygon
           const radarColor = dataset.color || '#3B82F6';
           ctx.fillStyle = radarColor + '30';
           ctx.strokeStyle = radarColor;
           ctx.lineWidth = 2;
           ctx.beginPath();
-          
+
           dataset.data.forEach((value: number, index: number) => {
             const angle = index * angleStep - Math.PI / 2;
             const distance = (value / maxRadarValue) * radarRadius;
             const x = radarCenterX + Math.cos(angle) * distance;
             const y = radarCenterY + Math.sin(angle) * distance;
-            
+
             if (index === 0) {
               ctx.moveTo(x, y);
             } else {
               ctx.lineTo(x, y);
             }
           });
-          
+
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
-          
+
           // Data points
           ctx.fillStyle = radarColor;
           dataset.data.forEach((value: number, index: number) => {
@@ -651,7 +651,7 @@ export function DrawingCanvas({
             const distance = (value / maxRadarValue) * radarRadius;
             const x = radarCenterX + Math.cos(angle) * distance;
             const y = radarCenterY + Math.sin(angle) * distance;
-            
+
             ctx.beginPath();
             ctx.arc(x, y, 3, 0, 2 * Math.PI);
             ctx.fill();
@@ -661,16 +661,16 @@ export function DrawingCanvas({
         case 'scatter':
           const scatterMaxValue = Math.max(...dataset.data, 1);
           const scatterColor = dataset.color || '#3B82F6';
-          
+
           ctx.fillStyle = scatterColor;
           dataset.data.forEach((value: number, index: number) => {
             const x = chartArea.x + (index / Math.max(dataset.data.length - 1, 1)) * chartArea.width;
             const y = chartArea.y + chartArea.height - (value / scatterMaxValue) * chartArea.height;
-            
+
             ctx.beginPath();
             ctx.arc(x, y, 5, 0, 2 * Math.PI);
             ctx.fill();
-            
+
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1;
             ctx.stroke();
@@ -698,7 +698,7 @@ export function DrawingCanvas({
     if (!ctx || !element.data || !element.dimensions) return;
 
     ctx.save();
-    
+
     if (isPreview) {
       ctx.globalAlpha = 0.7;
     }
@@ -715,7 +715,7 @@ export function DrawingCanvas({
     // Get or create cached chart canvas
     let chartCanvas = chartCanvasCache.current.get(element.id);
     if (!chartCanvas) {
-      chartCanvas = createChartCanvas(element);
+      chartCanvas = createChartCanvas(element) ?? undefined;
       if (chartCanvas) {
         chartCanvasCache.current.set(element.id, chartCanvas);
       }
@@ -744,7 +744,7 @@ export function DrawingCanvas({
     if (!ctx) return;
 
     ctx.save();
-    
+
     if (isPreview) {
       ctx.globalAlpha = 0.7;
     }
@@ -771,14 +771,14 @@ export function DrawingCanvas({
         if (element.points && element.points.length > 1) {
           ctx.beginPath();
           ctx.moveTo(element.points[0].x * zoom, element.points[0].y * zoom);
-          
+
           // Use quadratic curves for smoother lines
           for (let i = 1; i < element.points.length - 1; i++) {
             const currentPoint = element.points[i];
             const nextPoint = element.points[i + 1];
             const controlX = (currentPoint.x + nextPoint.x) / 2 * zoom;
             const controlY = (currentPoint.y + nextPoint.y) / 2 * zoom;
-            
+
             ctx.quadraticCurveTo(
               currentPoint.x * zoom,
               currentPoint.y * zoom,
@@ -786,12 +786,12 @@ export function DrawingCanvas({
               controlY
             );
           }
-          
+
           if (element.points.length > 1) {
             const lastPoint = element.points[element.points.length - 1];
             ctx.lineTo(lastPoint.x * zoom, lastPoint.y * zoom);
           }
-          
+
           ctx.stroke();
         }
         break;
@@ -800,14 +800,14 @@ export function DrawingCanvas({
         if (element.dimensions) {
           const width = element.dimensions.width * zoom;
           const height = element.dimensions.height * zoom;
-          
+
           if (element.properties.fill?.color && element.properties.fill.color !== 'transparent') {
             ctx.fillStyle = element.properties.fill.color;
             ctx.globalAlpha = element.properties.fill.opacity || 1;
             ctx.fillRect(scaledPos.x, scaledPos.y, width, height);
             ctx.globalAlpha = 1;
           }
-          
+
           ctx.strokeRect(scaledPos.x, scaledPos.y, width, height);
         }
         break;
@@ -818,17 +818,17 @@ export function DrawingCanvas({
           const radiusY = (element.dimensions.height / 2) * zoom;
           const centerX = scaledPos.x + radiusX;
           const centerY = scaledPos.y + radiusY;
-          
+
           ctx.beginPath();
           ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
-          
+
           if (element.properties.fill?.color && element.properties.fill.color !== 'transparent') {
             ctx.fillStyle = element.properties.fill.color;
             ctx.globalAlpha = element.properties.fill.opacity || 1;
             ctx.fill();
             ctx.globalAlpha = 1;
           }
-          
+
           ctx.stroke();
         }
         break;
@@ -839,7 +839,7 @@ export function DrawingCanvas({
             x: element.endPosition.x * zoom,
             y: element.endPosition.y * zoom
           };
-          
+
           ctx.beginPath();
           ctx.moveTo(scaledPos.x, scaledPos.y);
           ctx.lineTo(endPos.x, endPos.y);
@@ -853,18 +853,18 @@ export function DrawingCanvas({
             x: element.endPosition.x * zoom,
             y: element.endPosition.y * zoom
           };
-          
+
           // Draw line
           ctx.beginPath();
           ctx.moveTo(scaledPos.x, scaledPos.y);
           ctx.lineTo(endPos.x, endPos.y);
           ctx.stroke();
-          
+
           // Draw arrowhead
           const angle = Math.atan2(endPos.y - scaledPos.y, endPos.x - scaledPos.x);
           const arrowLength = 15 * zoom;
           const arrowAngle = Math.PI / 6;
-          
+
           ctx.beginPath();
           ctx.moveTo(endPos.x, endPos.y);
           ctx.lineTo(
@@ -920,10 +920,10 @@ export function DrawingCanvas({
 
     // Draw corner handles
     const handles = [
-      { x: scaledBounds.x - handleSize/2, y: scaledBounds.y - handleSize/2 },
-      { x: scaledBounds.x + scaledBounds.width - handleSize/2, y: scaledBounds.y - handleSize/2 },
-      { x: scaledBounds.x + scaledBounds.width - handleSize/2, y: scaledBounds.y + scaledBounds.height - handleSize/2 },
-      { x: scaledBounds.x - handleSize/2, y: scaledBounds.y + scaledBounds.height - handleSize/2 }
+      { x: scaledBounds.x - handleSize / 2, y: scaledBounds.y - handleSize / 2 },
+      { x: scaledBounds.x + scaledBounds.width - handleSize / 2, y: scaledBounds.y - handleSize / 2 },
+      { x: scaledBounds.x + scaledBounds.width - handleSize / 2, y: scaledBounds.y + scaledBounds.height - handleSize / 2 },
+      { x: scaledBounds.x - handleSize / 2, y: scaledBounds.y + scaledBounds.height - handleSize / 2 }
     ];
 
     handles.forEach(handle => {
@@ -943,7 +943,7 @@ export function DrawingCanvas({
   // Draw eraser cursor
   const drawEraserCursor = useCallback(() => {
     if (tool !== 'eraser' || !showEraserCursor) return;
-    
+
     const ctx = getContext();
     if (!ctx) return;
 
@@ -951,12 +951,12 @@ export function DrawingCanvas({
     ctx.strokeStyle = '#ff4444';
     ctx.lineWidth = 2;
     ctx.setLineDash([3, 3]);
-    
+
     const radius = strokeProperties.width * zoom * 3;
     ctx.beginPath();
     ctx.arc(eraserCursor.x * zoom, eraserCursor.y * zoom, radius, 0, 2 * Math.PI);
     ctx.stroke();
-    
+
     // Draw crosshair
     ctx.setLineDash([]);
     ctx.lineWidth = 1;
@@ -966,7 +966,7 @@ export function DrawingCanvas({
     ctx.moveTo(eraserCursor.x * zoom, (eraserCursor.y - 5) * zoom);
     ctx.lineTo(eraserCursor.x * zoom, (eraserCursor.y + 5) * zoom);
     ctx.stroke();
-    
+
     ctx.restore();
   }, [tool, showEraserCursor, getContext, strokeProperties.width, zoom, eraserCursor]);
 
@@ -974,12 +974,12 @@ export function DrawingCanvas({
   const redrawCanvas = useCallback(() => {
     clearCanvas();
     drawGrid();
-    
+
     // Draw all elements
     elements.forEach(element => {
       drawElement(element);
     });
-    
+
     // Draw preview element
     if (interaction.previewElement) {
       drawElement(interaction.previewElement, true);
@@ -996,19 +996,19 @@ export function DrawingCanvas({
 
     const point = getCanvasCoordinates(e.clientX, e.clientY);
     const constrainedPoint = constrainToCanvas(point);
-    
+
     if (tool === 'select') {
       // Check if clicking on an existing element (reverse order for top-most element)
       const clickedElement = [...elements].reverse().find(element => isPointInElement(constrainedPoint, element));
-      
+
       if (clickedElement && onElementSelect) {
         onElementSelect(clickedElement.id);
         setIsDragging(true);
         setDraggedElement(clickedElement.id);
-        
+
         // Calculate drag offset based on element type
         let offsetX = 0, offsetY = 0;
-        
+
         switch (clickedElement.type) {
           case 'pen':
             if (clickedElement.points && clickedElement.points.length > 0) {
@@ -1021,7 +1021,7 @@ export function DrawingCanvas({
             offsetY = constrainedPoint.y - clickedElement.position.y;
             break;
         }
-        
+
         setDragOffset({ x: offsetX, y: offsetY });
       } else {
         // Clear selection if clicking empty space
@@ -1087,7 +1087,7 @@ export function DrawingCanvas({
 
         // Move the element
         const movedElement = moveElement(selectedElement, moveOffset);
-        
+
         // Update the element
         onElementUpdate(selectedElement.id, movedElement);
       }
@@ -1095,11 +1095,11 @@ export function DrawingCanvas({
     }
 
     if (!interaction.isDrawing || !interaction.startPoint) return;
-    
+
     if (tool === 'pen') {
       // Add point to current path for real-time drawing
       setCurrentPath(prev => [...prev, constrainedPoint]);
-      
+
       // Create a preview element with current path
       const previewElement: DrawingElement = {
         id: 'preview_pen',
@@ -1109,11 +1109,11 @@ export function DrawingCanvas({
         points: [...currentPath, constrainedPoint],
         timestamp: Date.now()
       };
-      
-      setInteraction(prev => ({ 
-        ...prev, 
+
+      setInteraction(prev => ({
+        ...prev,
         currentPoint: constrainedPoint,
-        previewElement 
+        previewElement
       }));
     } else {
       // Create preview element for shapes
@@ -1123,7 +1123,7 @@ export function DrawingCanvas({
         tool,
         strokeProperties
       );
-      
+
       setInteraction(prev => ({
         ...prev,
         currentPoint: constrainedPoint,
@@ -1214,7 +1214,7 @@ export function DrawingCanvas({
     properties: StrokeProperties
   ): DrawingElement | null => {
     const id = `${elementType}_${Date.now()}`;
-    
+
     switch (elementType) {
       case 'rectangle':
         return {
@@ -1231,7 +1231,7 @@ export function DrawingCanvas({
           properties: { stroke: properties },
           timestamp: Date.now()
         };
-        
+
       case 'circle':
         return {
           id,
@@ -1247,7 +1247,7 @@ export function DrawingCanvas({
           properties: { stroke: properties },
           timestamp: Date.now()
         };
-        
+
       case 'line':
       case 'arrow':
         return {
@@ -1258,7 +1258,7 @@ export function DrawingCanvas({
           properties: { stroke: properties },
           timestamp: Date.now()
         };
-        
+
       default:
         return null;
     }
@@ -1273,7 +1273,7 @@ export function DrawingCanvas({
     const rect = container.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
-    
+
     redrawCanvas();
   }, [redrawCanvas]);
 
@@ -1290,14 +1290,14 @@ export function DrawingCanvas({
   }, [redrawCanvas]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={cn("relative w-full h-full overflow-hidden", className)}
-      style={{ 
-        cursor: tool === 'eraser' ? 'none' : 
-               tool === 'select' ? 'default' : 
-               tool === 'text' ? 'text' :
-               'crosshair' 
+      style={{
+        cursor: tool === 'eraser' ? 'none' :
+          tool === 'select' ? 'default' :
+            tool === 'text' ? 'text' :
+              'crosshair'
       }}
     >
       <canvas
@@ -1308,7 +1308,7 @@ export function DrawingCanvas({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
       />
-      
+
       {/* Text Input Overlay */}
       {isEditingText && (
         <div
