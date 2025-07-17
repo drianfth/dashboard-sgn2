@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <Script
-          defer src="http://localhost:3000/script.js" data-website-id="df18a018-08c5-4242-8756-dd2272e1afac"
+          defer src="https://analytics.bkn.go.id/script.js" data-website-id="c54e0cf8-e804-4618-9487-e98572cfe66c"
         />
       </head>
       <body className={inter.className}>{children}</body>
